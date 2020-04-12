@@ -1063,7 +1063,7 @@ def svf_search_result():
 def mocked_api(svf_search_result, svf_answers_result):
     with respx.mock(base_url=StackOverflow.url()) as httpx_mock:
         httpx_mock.get(
-            "/search?site=stackoverflow&intitle=flask",
+            f"{StackOverflow.VERSION}/search?site=stackoverflow&intitle=flask",
             content=svf_search_result,
             alias="questions",
         )
@@ -1071,7 +1071,7 @@ def mocked_api(svf_search_result, svf_answers_result):
             map(str, StackOverflow.extract_question_ids(svf_search_result))
         )
         httpx_mock.get(
-            f"/questions/{';'.join(questions_ids)}/answers",
+            f"{StackOverflow.VERSION}/questions/{';'.join(questions_ids)}/answers?site=stackoverflow",
             content=svf_answers_result,
             alias="answers",
         )

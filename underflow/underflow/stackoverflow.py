@@ -49,7 +49,8 @@ class StackOverflow:
     def url():
         return f"{StackOverflow.BASE_URL}/{StackOverflow.VERSION}"
 
-    def default_query_params(self):
+    @staticmethod
+    def default_query_params():
         return {"site": "stackoverflow"}
 
     @staticmethod
@@ -67,7 +68,7 @@ class StackOverflow:
                 "intitle": questions,
                 **kwargs,
             }
-            response = client.get("/search", params=query_params).json()
+            response = client.get(f"/{self.VERSION}/search", params=query_params).json()
             titles = self._extract_titles(response)
             question_ids = self.extract_question_ids(response)
             answers = self._answers_for(client, question_ids)
@@ -79,7 +80,7 @@ class StackOverflow:
     def _answers_for(self, client, question_ids: list) -> dict:
         str_ids = list(map(str, question_ids))
         response = client.get(
-            f"/questions/{';'.join(str_ids)}/answers",
+            f"{self.VERSION}/questions/{';'.join(str_ids)}/answers",
             params=self.default_query_params(),
         )
         answers = {question_id: [] for question_id in question_ids}
