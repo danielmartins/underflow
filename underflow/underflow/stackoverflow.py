@@ -1,8 +1,15 @@
 from dataclasses import dataclass
+from http import HTTPStatus
 from typing import List
-from urllib.parse import quote
 
 import httpx
+
+from underflow.settings import settings as default_settings
+
+STACK_OATH_URL = (
+    f"https://stackoverflow.com/oauth/dialog?"
+    f"client_id={default_settings.sck_client_id}&scope=no_expiry&redirect_uri={default_settings.sck_redirect_uri}"
+)
 
 
 @dataclass
@@ -30,36 +37,44 @@ class Question:
 class StackOverflow:
     BASE_URL = "https://api.stackexchange.com"
     VERSION = "2.2"
-    ALLOWED_PARAMS = [
-        "page",
-        "todate",
-        "pagesize",
-        "fromdate",
-        "todate",
-        "order",
-        "min",
-        "max",
-        "sort",
-        "tagged",
-        "nottagged",
-        "intitle",
-    ]
+
+    def __init__(self, settings=None):
+        self._token = ""
+        self.settings = settings or default_settings
+
+    @property
+    def token(self):
+        return self._token
+
+    @token.setter
+    def token(self, token):
+        self._token = token
 
     @staticmethod
     def url():
         return f"{StackOverflow.BASE_URL}/{StackOverflow.VERSION}"
 
-    @staticmethod
-    def default_query_params():
-        return {"site": "stackoverflow"}
+    def default_query_params(self):
+        base = {"site": "stackoverflow", "filter": "!9Z(-x.0nI"}
+        if hasattr(self, "_token"):
+            base.update(
+                {"access_token": self._token, "key": self.settings.sck_client_key}
+            )
+        return base
 
     @staticmethod
     def extract_question_ids(data):
-        return [q["question_id"] for q in data["items"]]
+        result = []
+        if data["items"]:
+            result = [q["question_id"] for q in data["items"]]
+        return result
 
     @staticmethod
     def _extract_titles(data):
         return {q["question_id"]: q["title"] for q in data["items"]}
+
+    def extract_wrapper(self, response):
+        self.current_request = response
 
     def search(self, questions: str, **kwargs) -> List[Question]:
         with httpx.Client(base_url=self.url()) as client:
@@ -68,9 +83,17 @@ class StackOverflow:
                 "intitle": questions,
                 **kwargs,
             }
-            response = client.get(f"/{self.VERSION}/search", params=query_params).json()
-            titles = self._extract_titles(response)
-            question_ids = self.extract_question_ids(response)
+            response = client.get(f"/{self.VERSION}/search", params=query_params)
+            if response.status_code != HTTPStatus.OK:
+                return self.handle_error(response)
+
+            result = response.json()
+            self.extract_wrapper(result)
+            titles = self._extract_titles(result)
+            question_ids = self.extract_question_ids(result)
+            if not question_ids:
+                return []
+
             answers = self._answers_for(client, question_ids)
             return [
                 Question(title=titles.get(item), answers=answers.get(item),)
@@ -87,3 +110,20 @@ class StackOverflow:
         for item in response.json()["items"]:
             answers[item["question_id"]].append(Answer.make(item))
         return answers
+
+    def handle_error(self, response):
+        if response.status_code == HTTPStatus.BAD_REQUEST:
+            self._last_exception = ThrottleException(
+                "Free limit reached", data=response.json()
+            )
+            raise self._last_exception
+
+
+class ThrottleException(Exception):
+    def __init__(self, *args: object, data: dict) -> None:
+        super().__init__(*args)
+        self._error_data = data
+
+    @property
+    def data(self):
+        return self._error_data
