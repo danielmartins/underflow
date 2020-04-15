@@ -1,6 +1,7 @@
 [tool.poetry]
 name = "underflow"
-version = "0.1.1"
+version = "0.1.2"
+homepage="https://github.com/danielmartins/underflow"
 description = "Pesquisas do stackoverflow via cli"
 readme = "README.rst"
 authors = ["Daniel Santos <daniel.martins@lumedigital.com.br>"]
