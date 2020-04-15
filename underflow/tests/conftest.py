@@ -409,6 +409,8 @@ def svf_answers_result():
         "has_more": False,
         "quota_max": 10000,
         "quota_remaining": 9967,
+        "page_size": 30,
+        "total": 10000,
     }
 
 
@@ -1056,6 +1058,8 @@ def svf_search_result():
         "has_more": True,
         "quota_max": 10000,
         "quota_remaining": 9991,
+        "page_size": 30,
+        "total": 10000,
     }
 
 
@@ -1063,7 +1067,7 @@ def svf_search_result():
 def mocked_api(svf_search_result, svf_answers_result):
     with respx.mock(base_url=StackOverflow.url()) as httpx_mock:
         httpx_mock.get(
-            f"{StackOverflow.VERSION}/search?site=stackoverflow&intitle=flask",
+            f"{StackOverflow.VERSION}/search?site=stackoverflow&filter=%219Z%28-x.0nI&intitle=flask&page=1&sort=relevance&order=desc",
             content=svf_search_result,
             alias="questions",
         )
@@ -1071,7 +1075,7 @@ def mocked_api(svf_search_result, svf_answers_result):
             map(str, StackOverflow.extract_question_ids(svf_search_result))
         )
         httpx_mock.get(
-            f"{StackOverflow.VERSION}/questions/{';'.join(questions_ids)}/answers?site=stackoverflow",
+            f"{StackOverflow.VERSION}/questions/{';'.join(questions_ids)}/answers?site=stackoverflow&filter=%219Z%28-x.0nI",
             content=svf_answers_result,
             alias="answers",
         )
