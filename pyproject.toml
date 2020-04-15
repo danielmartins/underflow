@@ -1,0 +1,40 @@
+[tool.poetry]
+name = "underflow"
+version = "0.1.1"
+description = "Pesquisas do stackoverflow via cli"
+readme = "README.rst"
+authors = ["Daniel Santos <daniel.martins@lumedigital.com.br>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+typer = "^0.1.1"
+httpx = "^0.12.1"
+click-spinner = "^0.1.8"
+tabulate = "^0.8.7"
+python-telegram-bot = "^12.6.1"
+fastapi = "^0.54.1"
+uvicorn = "^0.11.3"
+dacite = "^1.4.0"
+pydantic = {extras = ["dotenv"], version = "^1.4"}
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+flake8 = "^3.7.9"
+flake8-isort = "^2.9.1"
+coverage = "^5.0.4"
+black = "^19.10b0"
+pylint = "^2.4.4"
+pre-commit = "^2.2.0"
+assertpy = "^1.0"
+respx = "^0.10.1"
+typer-cli = "^0.0.8"
+rstvalidator = "^2019.4.13"
+requests = "^2.23.0"
+
+[tool.poetry.scripts]
+underflow = 'underflow.cli:app'
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
+
