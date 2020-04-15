@@ -2,8 +2,8 @@ import logging
 
 import httpx
 from dacite import from_dict
-from telegram.ext import CommandHandler, Filters, MessageHandler, Updater
 
+from telegram.ext import CommandHandler, Filters, MessageHandler, Updater
 from underflow.settings import settings
 from underflow.stackoverflow import Question
 
