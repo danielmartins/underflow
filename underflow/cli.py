@@ -44,10 +44,18 @@ def tab(items):
 @app.command()
 def ask(
     query: str,
-    page: int = typer.Option(1, help="Which page to show", show_default=True),
-    sort: str = typer.Option("relevance", help="Items sort.", show_default=True),
-    order: str = typer.Option("desc", help="Elements order", show_default=True),
+    page: int = typer.Option(1, help="Paginação", show_default=True),
+    sort: str = typer.Option("relevance", help="Critério de ordenação dos resultados", show_default=True),
+    order: str = typer.Option("desc", help="Direção da ordenação dos resultados", show_default=True),
 ):
+    """
+    Execute uma pesquisa do StackOverflow
+
+    Para que a pesquisa funcione corretamente, é necessário iniciar a api primeiro.
+
+    Para iniciar a api consulte o comando start-api
+
+    """
     query_fmt = typer.style(f"{query}", fg=typer.colors.YELLOW, bold=True)
     typer.echo("Searching for..." + query_fmt)
     result = httpx.post(
@@ -95,22 +103,35 @@ def ask(
 
 @app.command()
 def bot_server():
+    """
+    Inicializa o servidor de processamento de mensagens do bot do telegram
+    """
     typer.echo(f"Telegram bot server...")
     telegram.main()
 
 
 @app.command()
 def authenticate():
+    """
+    Inicializa processo de autenticação no modo implicito com o StackOverflow
+    """
     webbrowser.get(using="google-chrome").open(STACK_OATH_URL)
 
 
 @app.command()
 def start_api():
+    """
+    Inicializa servidor de api rest local que interage com o stackoverflow
+    """
     uvicorn.run("underflow.api:app", host="127.0.0.1", port=8000, log_level="debug")
 
 
 @app.command()
 def config():
+    """
+    Imprime as configurações atuais usadas
+    @return:
+    """
     print(settings.dict())
 
 
