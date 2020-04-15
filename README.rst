@@ -19,13 +19,18 @@ Arquitetura do projeto
 O Projeto está dividido hein:
 
   * API de Comunicação com StackOverflow
+  
     * Executa pesquisa na API;
     * Executa paginação preemptiva
     * Captura token de autenticação com a API do Stack OverFlow (Para permitir maior quota de requisições)
+    
   * CLI de interação com a API de Comunicação
+  
     * Interage com a API interna de comunicação
     * Redireciona requisição de autenticação OAuth pro StackOverFlow, modo implicito.
+    
   * Bot Server
+  
     * Responde as solicitações de pessoas interagindo com o bot
 
 
