@@ -73,7 +73,7 @@ O nome do bot no Telegram é UnderflowBot. Para responder as solicitações oriu
 informações secretas de integração, solicitar para o author. De posse dessa informações, voce exporta para variaveis
 de ambiente e executar o comando abaixo para responder as solicitações.
 
-  $ underflow bot start
+  $ underflow bot-server
 
 
 Desenvolvimento

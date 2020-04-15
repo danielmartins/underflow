@@ -56,7 +56,7 @@ class StackOverflow:
 
     def default_query_params(self):
         base = {"site": "stackoverflow", "filter": "!9Z(-x.0nI"}
-        if hasattr(self, "_token"):
+        if self._token:
             base.update(
                 {"access_token": self._token, "key": self.settings.sck_client_key}
             )
@@ -76,13 +76,23 @@ class StackOverflow:
     def extract_wrapper(self, response):
         self.current_request = response
 
-    def search(self, questions: str, **kwargs) -> List[Question]:
+    def search(
+        self,
+        questions: str,
+        sort: str = "relevance",
+        order: str = "desc",
+        page: int = 1,
+        **kwargs,
+    ) -> List[Question]:
+        query_params = {
+            **self.default_query_params(),
+            "intitle": questions,
+            "page": page,
+            "sort": sort,
+            "order": order,
+            **kwargs,
+        }
         with httpx.Client(base_url=self.url()) as client:
-            query_params = {
-                **self.default_query_params(),
-                "intitle": questions,
-                **kwargs,
-            }
             response = client.get(f"/{self.VERSION}/search", params=query_params)
             if response.status_code != HTTPStatus.OK:
                 return self.handle_error(response)

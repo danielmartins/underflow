@@ -29,6 +29,7 @@ assertpy = "^1.0"
 respx = "^0.10.1"
 typer-cli = "^0.0.8"
 rstvalidator = "^2019.4.13"
+requests = "^2.23.0"
 
 [tool.poetry.scripts]
 underflow = 'underflow.cli:app'
